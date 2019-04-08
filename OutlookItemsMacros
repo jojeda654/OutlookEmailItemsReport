@@ -1,0 +1,187 @@
+Sub ExportToExcel()
+On Error GoTo ErrHandler
+Dim appExcel As Excel.Application
+Dim xlWorkbook As Excel.Workbook
+Dim xlWorksheet As Excel.Worksheet
+
+
+
+Dim xlRange As Excel.Range
+Dim strOlItemClass As String
+Dim strXlFilename As String
+Dim strXlFilepath As String
+Dim strXlTimestamp As String
+Dim intRowCounter As Integer
+Dim intColumnCounter As Integer
+Dim olMailItem As Object
+Dim olNameSpace As Outlook.NameSpace
+Dim olFolder As Outlook.MAPIFolder
+
+    strXlFilename = "_OutlookItems.xls"
+    strXlFilepath = "H:\Test\"
+    strXlTimestamp = Format(Now, "yyyymmdd")
+    strXlFilename = strXlFilepath & strXlTimestamp & strXlFilename
+
+  'Select export folder
+Set olNameSpace = Application.GetNamespace("MAPI")
+Set olFolder = olNameSpace.PickFolder
+  'Handle potential errors with Select Folder dialog box.
+If olFolder Is Nothing Then
+MsgBox "There are no mail messages to export", vbOKOnly, "Error"
+
+
+Exit Sub
+
+
+ElseIf olFolder.DefaultItemType <> 0 Then
+
+
+MsgBox "There are no mail messages to export", vbOKOnly, "Error"
+
+
+Exit Sub
+
+
+ElseIf olFolder.Items.Count = 0 Then
+
+
+MsgBox "There are no mail messages to export", vbOKOnly, "Error"
+
+
+Exit Sub
+
+
+End If
+
+Set appExcel = CreateObject("Excel.Application")
+appExcel.Application.Visible = True
+
+If Dir(strXlFilename) > "" Then
+    Set xlWorkbook = appExcel.Workbooks.Open(strXlFilename)
+    Set xlWorksheet = xlWorkbook.Worksheets.Add
+    xlWorksheet.Activate
+Else
+    Set xlWorkbook = appExcel.Workbooks.Add
+    Set xlWorksheet = xlWorkbook.Sheets(1)
+    xlWorkbook.SaveAs (strXlFilename)
+ End If
+    
+    xlWorksheet.Activate
+  xlWorksheet.Name = olFolder & " (" & olFolder.Items.Count & ")"
+
+  For Each olMailItem In olFolder.Items
+
+Set olMailItem = olMailItem
+
+intRowCounter = intRowCounter + 1
+intColumnCounter = 0
+
+If olMailItem.Class = 43 Then
+
+intColumnCounter = intColumnCounter + 1
+Set xlRange = xlWorksheet.Cells(intRowCounter, intColumnCounter)
+xlRange.Value = "MailItem"
+
+intColumnCounter = intColumnCounter + 1
+Set xlRange = xlWorksheet.Cells(intRowCounter, intColumnCounter)
+xlRange.Value = olMailItem.To
+
+intColumnCounter = intColumnCounter + 1
+Set xlRange = xlWorksheet.Cells(intRowCounter, intColumnCounter)
+xlRange.Value = olMailItem.SenderEmailAddress
+
+intColumnCounter = intColumnCounter + 1
+Set xlRange = xlWorksheet.Cells(intRowCounter, intColumnCounter)
+xlRange.Value = olMailItem.Subject
+
+intColumnCounter = intColumnCounter + 1
+Set xlRange = xlWorksheet.Cells(intRowCounter, intColumnCounter)
+xlRange.Value = olMailItem.CreationTime
+
+intColumnCounter = intColumnCounter + 1
+Set xlRange = xlWorksheet.Cells(intRowCounter, intColumnCounter)
+xlRange.Value = olMailItem.SentOn
+
+intColumnCounter = intColumnCounter + 1
+Set xlRange = xlWorksheet.Cells(intRowCounter, intColumnCounter)
+xlRange.Value = olMailItem.ReceivedTime
+
+intColumnCounter = intColumnCounter + 1
+Set xlRange = xlWorksheet.Cells(intRowCounter, intColumnCounter)
+xlRange.Value = olMailItem.Categories
+
+ElseIf olMailItem.Class = 46 Then
+
+intColumnCounter = intColumnCounter + 1
+Set xlRange = xlWorksheet.Cells(intRowCounter, intColumnCounter)
+xlRange.Value = "ReportItem"
+
+intColumnCounter = intColumnCounter + 1
+Set xlRange = xlWorksheet.Cells(intRowCounter, intColumnCounter)
+'xlRange.Value = olMailItem.To
+
+intColumnCounter = intColumnCounter + 1
+Set xlRange = xlWorksheet.Cells(intRowCounter, intColumnCounter)
+'xlRange.Value = olMailItem.SenderEmailAddress
+
+intColumnCounter = intColumnCounter + 1
+Set xlRange = xlWorksheet.Cells(intRowCounter, intColumnCounter)
+xlRange.Value = olMailItem.Subject
+
+intColumnCounter = intColumnCounter + 1
+Set xlRange = xlWorksheet.Cells(intRowCounter, intColumnCounter)
+xlRange.Value = olMailItem.CreationTime
+
+intColumnCounter = intColumnCounter + 1
+Set xlRange = xlWorksheet.Cells(intRowCounter, intColumnCounter)
+'xlRange.Value = olMailItem.SentOn
+
+intColumnCounter = intColumnCounter + 1
+Set xlRange = xlWorksheet.Cells(intRowCounter, intColumnCounter)
+'xlRange.Value = olMailItem.ReceivedTime
+
+intColumnCounter = intColumnCounter + 1
+Set xlRange = xlWorksheet.Cells(intRowCounter, intColumnCounter)
+xlRange.Value = olMailItem.Categories
+
+ End If
+
+
+ Next olMailItem
+
+Set appExcel = Nothing
+
+Set xlWorkbook = Nothing
+Set xlWorksheet = Nothing
+Set xlRange = Nothing
+
+Set olMailItem = Nothing
+Set olNameSpace = Nothing
+Set olFolder = Nothing
+Set olMailItem = Nothing
+
+  Exit Sub
+ErrHandler:  If Err.Number = 1004 Then
+MsgBox strXlFilename & " doesn't exist", vbOKOnly, "Error"
+
+
+Else
+
+
+MsgBox "Description: " & Err.Description & Erl, vbOKOnly, "Error #" & Err.Number
+
+
+End If
+
+
+Set appExcel = Nothing
+
+Set xlWorkbook = Nothing
+Set xlWorksheet = Nothing
+Set xlRange = Nothing
+
+Set olMailItem = Nothing
+Set olNameSpace = Nothing
+Set olFolder = Nothing
+Set olMailItem = Nothing
+End Sub
